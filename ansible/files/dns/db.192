@@ -1,0 +1,9 @@
+$TTL 604800
+@   IN  SOA dns.jhingal.izv. admin.jhingal.izv. (
+            1
+            604800
+            86400
+            2419200
+            604800 )
+@       IN  NS      dns.jhingal.izv.
+20      IN PTR      dns.jhingal.izv.
