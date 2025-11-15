@@ -1,0 +1,11 @@
+zone "jhingal.izv" IN {
+    type master;
+    file "/etc/bind/db.jhingal.izv";
+    allow-update { key "ddns-key"; };
+};
+
+zone "58.168.192.in-addr.arpa" IN {
+    type master;
+    file "/etc/bind/db.192";
+    allow-update { key "ddns-key"; };
+};
