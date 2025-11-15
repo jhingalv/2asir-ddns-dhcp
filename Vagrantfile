@@ -27,7 +27,7 @@ Vagrant.configure("2") do |config|
   # CLIENT
   config.vm.define "client" do |client|
     client.vm.hostname = "client"
-    client.vm.network "private_network"
+    client.vm.network "private_network", type: "dhcp"
     client.vm.provision "ansible" do |ansible|
       ansible.playbook = "ansible/site.yml"
       ansible.inventory_path = "ansible/inventory"
