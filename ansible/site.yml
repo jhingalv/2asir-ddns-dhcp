@@ -1,0 +1,11 @@
+- hosts: dns
+  roles:
+    - dns
+
+- hosts: dhcp
+  roles:
+    - dhcp
+
+- hosts: client
+  roles:
+    - client
