@@ -1,25 +1,25 @@
 all:
   children:
-    dns:
+    dns-group:
       hosts:
         dns:
           ansible_host: 127.0.0.1
-          ansible_port: 2200
+          ansible_port: 2222
           ansible_user: vagrant
           ansible_ssh_private_key_file: .vagrant/machines/dns/virtualbox/private_key
 
-    dhcp:
+    dhcp-group:
       hosts:
         dhcp:
           ansible_host: 127.0.0.1
-          ansible_port: 2201
+          ansible_port: 2200
           ansible_user: vagrant
           ansible_ssh_private_key_file: .vagrant/machines/dhcp/virtualbox/private_key
 
-    client:
+    client-group:
       hosts:
         client:
           ansible_host: 127.0.0.1
-          ansible_port: 2202
+          ansible_port: 2201
           ansible_user: vagrant
           ansible_ssh_private_key_file: .vagrant/machines/cliente/virtualbox/private_key

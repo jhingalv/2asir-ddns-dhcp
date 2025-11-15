@@ -1,11 +1,11 @@
-- hosts: dns
+- hosts: dns-group
   roles:
     - dns
 
-- hosts: dhcp
+- hosts: dhcp-group
   roles:
     - dhcp
 
-- hosts: client
+- hosts: client-group
   roles:
     - client
