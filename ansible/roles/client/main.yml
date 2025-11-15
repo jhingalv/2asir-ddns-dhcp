@@ -1,0 +1,9 @@
+- name: Install tools
+  apt:
+    name:
+      - dnsutils
+      - isc-dhcp-client
+    state: present
+
+- name: Renovate DHCP
+  command: dhclient -r && dhclient
