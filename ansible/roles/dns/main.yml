@@ -1,0 +1,32 @@
+- name: Install BIND9
+  apt:
+    name: bind9
+    state: present
+    update_cache: yes
+
+- name: Copy DNS config files
+  copy:
+    src: dns/
+    dest: /etc/bind/
+    owner: bind
+    group: bind
+    mode: '0644'
+
+- name: Generate TSIG key
+  command: tsig-keygen -a hmac-sha256 ddns-key
+  register: tsig
+  args:
+    creates: /etc/bind/ddns.key
+
+- name: Save TSIG key
+  copy:
+    dest: /etc/bind/ddns.key
+    content: "{{ tsig.stdout }}"
+    owner: bind
+    group: bind
+    mode: '0600'
+
+- name: Restart BIND9
+  service:
+    name: bind9
+    state: restarted
