@@ -6,4 +6,4 @@ $TTL 604800
             2419200
             604800 )
 @       IN  NS      dns.jhingal.izv.
-20      IN PTR      dns.jhingal.izv.
+10      IN PTR      dns.jhingal.izv.
