@@ -2,8 +2,11 @@ options {
     directory "/var/cache/bind";
 
     recursion yes;
+    allow-new-zones yes;
+    dnssec-update-mode insecure-no-resign;
     dnssec-validation auto;
 
+    listen-on { any; };
     listen-on-v6 { any; };
 };
 
