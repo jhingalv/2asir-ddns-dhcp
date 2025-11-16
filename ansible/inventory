@@ -1,6 +1,6 @@
 all:
   children:
-    dns-group:
+    dnsgroup:
       hosts:
         dns:
           ansible_host: 127.0.0.1
@@ -9,7 +9,7 @@ all:
           ansible_ssh_private_key_file: .vagrant/machines/dns/virtualbox/private_key
           ansible_python_interpreter: /usr/bin/python3
 
-    dhcp-group:
+    dhcpgroup:
       hosts:
         dhcp:
           ansible_host: 127.0.0.1
@@ -18,7 +18,7 @@ all:
           ansible_ssh_private_key_file: .vagrant/machines/dhcp/virtualbox/private_key
           ansible_python_interpreter: /usr/bin/python3
 
-    client-group:
+    clientgroup:
       hosts:
         client:
           ansible_host: 127.0.0.1
