@@ -1,4 +1,5 @@
 - name: Install tools
+  become: yes
   apt:
     name:
       - dnsutils
@@ -6,4 +7,4 @@
     state: present
 
 - name: Renovate DHCP
-  command: dhclient -r && dhclient
+  command: dhclient -r eth1 && dhclient eth1 -v

@@ -1,26 +1,32 @@
-- name: Install DHCP server
+- name: Install ISC DHCP Server
+  become: yes
   apt:
     name: isc-dhcp-server
     state: present
     update_cache: yes
 
-- name: Wait for the key to appear on DNS
-  wait_for:
-    path: /etc/bind/ddns.key
-  delegate_to: dns
-
-- name: Obtain TSIG key from DNS
+- name: Copy TSIG key from DNS
   fetch:
     src: /etc/bind/ddns.key
     dest: /tmp/ddns.key
     flat: yes
-  delegate_to: dns
+    delegate_to: dns
 
-- name: Copy TSIG key to DHCP
+- name: Copy TSIG key to DHCP server
   copy:
     src: /tmp/ddns.key
     dest: /etc/dhcp/ddns.key
+    owner: root
+    group: root
     mode: '0600'
+
+- name: Copy DHCP configuration
+  copy:
+    src: dhcpd.conf
+    dest: /etc/dhcp/dhcpd.conf
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Configure DHCP interface
   lineinfile:
@@ -28,12 +34,8 @@
     regexp: '^INTERFACESv4='
     line: 'INTERFACESv4="eth1"'
 
-- name: Copy dhcpd.conf
-  copy:
-    src: dhcp/dhcpd.conf
-    dest: /etc/dhcp/dhcpd.conf
-
-- name: Restart DHCP
+- name: Ensure DHCP server is started and enabled
   service:
     name: isc-dhcp-server
     state: restarted
+    enabled: yes
