@@ -1,41 +1,50 @@
-- name: Install ISC DHCP Server
+- name: Configure ISC DHCP Server
+  hosts: dhcp
   become: yes
-  apt:
-    name: isc-dhcp-server
-    state: present
-    update_cache: yes
+  vars:
+    dhcp_interface: eth1
+    tsig_temp_path: /tmp/ddns.key
+    tsig_dest_path: /etc/dhcp/ddns.key
 
-- name: Copy TSIG key from DNS
-  fetch:
-    src: /etc/bind/ddns.key
-    dest: /tmp/ddns.key
-    flat: yes
-    delegate_to: dns
+  tasks:
 
-- name: Copy TSIG key to DHCP server
-  copy:
-    src: /tmp/ddns.key
-    dest: /etc/dhcp/ddns.key
-    owner: root
-    group: root
-    mode: '0600'
+    - name: Install ISC DHCP Server
+      apt:
+        name: isc-dhcp-server
+        state: present
+        update_cache: yes
 
-- name: Copy DHCP configuration
-  copy:
-    src: dhcpd.conf
-    dest: /etc/dhcp/dhcpd.conf
-    owner: root
-    group: root
-    mode: '0644'
+    - name: Copy TSIG key from DNS
+      fetch:
+        src: /etc/bind/ddns.key
+        dest: "{{ tsig_temp_path }}"
+        flat: yes
+      delegate_to: dns
 
-- name: Configure DHCP interface
-  lineinfile:
-    path: /etc/default/isc-dhcp-server
-    regexp: '^INTERFACESv4='
-    line: 'INTERFACESv4="eth1"'
+    - name: Copy TSIG key to DHCP server
+      copy:
+        src: "{{ tsig_temp_path }}"
+        dest: "{{ tsig_dest_path }}"
+        owner: root
+        group: root
+        mode: '0600'
 
-- name: Ensure DHCP server is started and enabled
-  service:
-    name: isc-dhcp-server
-    state: restarted
-    enabled: yes
+    - name: Copy DHCP configuration
+      copy:
+        src: dhcpd.conf
+        dest: /etc/dhcp/dhcpd.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Configure DHCP interface
+      lineinfile:
+        path: /etc/default/isc-dhcp-server
+        regexp: '^INTERFACESv4='
+        line: "INTERFACESv4=\"{{ dhcp_interface }}\""
+
+    - name: Ensure DHCP server is started and enabled
+      service:
+        name: isc-dhcp-server
+        state: restarted
+        enabled: yes

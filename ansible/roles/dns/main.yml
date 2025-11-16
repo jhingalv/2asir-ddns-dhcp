@@ -1,69 +1,77 @@
-- name: Install BIND9
+- name: Configure BIND9 DNS Server
+  hosts: dns
   become: yes
-  apt:
-    name: bind9
-    state: present
-    update_cache: yes
+  vars:
+    tsig_key_path: /etc/bind/ddns.key
 
-- name: Generate TSIG key if it does not exist
-  command: tsig-keygen -a hmac-sha256 ddns-key
-  register: tsig_key
-  args:
-    creates: /etc/bind/ddns.key
+  tasks:
 
-- name: Save TSIG key
-  copy:
-    content: "{{ tsig_key.stdout }}"
-    dest: /etc/bind/ddns.key
-    owner: root
-    group: bind
-    mode: '0600'
-  when: tsig_key is changed
+    - name: Install BIND9
+      apt:
+        name: bind9
+        state: present
+        update_cache: yes
 
-- name: Include TSIG key in named.conf.options
-  blockinfile:
-    path: /etc/bind/named.conf.options
-    marker: "# {mark} ANSIBLE DDNS KEY"
-    block: |
-      key "ddns-key" {
-        algorithm hmac-sha256;
-        secret "{{ tsig_key.stdout_lines[1].split(' ')[2] | replace(';','') }}";
-      };
+    - name: Generate TSIG key if it does not exist
+      command: tsig-keygen -a hmac-sha256 ddns-key
+      register: tsig_key
+      args:
+        creates: "{{ tsig_key_path }}"
 
-- name: Copy named.conf.options
-  copy:
-    src: named.conf.options
-    dest: /etc/bind/named.conf.options
-    owner: root
-    group: bind
-    mode: '0644'
+    - name: Save TSIG key
+      copy:
+        content: "{{ tsig_key.stdout }}"
+        dest: "{{ tsig_key_path }}"
+        owner: root
+        group: bind
+        mode: '0600'
+      when: tsig_key is changed
 
-- name: Copy named.conf.local
-  copy:
-    src: named.conf.local
-    dest: /etc/bind/named.conf.local
-    owner: root
-    group: bind
-    mode: '0644'
+    - name: Include TSIG key in named.conf.options
+      blockinfile:
+        path: /etc/bind/named.conf.options
+        marker: "# {mark} ANSIBLE DDNS KEY"
+        block: |
+          key "ddns-key" {
+            algorithm hmac-sha256;
+            secret "{{ tsig_key.stdout_lines[1].split(' ')[2] | replace(';','') }}";
+          };
+      when: tsig_key is changed
 
-- name: Copy zone file for forward lookup
-  copy:
-    src: db.jhingal.izv
-    dest: /etc/bind/db.jhingal.izv
-    owner: root
-    group: bind
-    mode: '0644'
+    - name: Copy named.conf.options
+      copy:
+        src: named.conf.options
+        dest: /etc/bind/named.conf.options
+        owner: root
+        group: bind
+        mode: '0644'
 
-- name: Copy zone file for reverse lookup
-  copy:
-    src: db.192
-    dest: /etc/bind/db.192
-    owner: root
-    group: bind
-    mode: '0644'
+    - name: Copy named.conf.local
+      copy:
+        src: named.conf.local
+        dest: /etc/bind/named.conf.local
+        owner: root
+        group: bind
+        mode: '0644'
 
-- name: Ensure BIND9 is started and enabled
-  service:
-    name: bind9
-    state: started
-    enabled: yes
+    - name: Copy zone file for forward lookup
+      copy:
+        src: db.jhingal.izv
+        dest: /etc/bind/db.jhingal.izv
+        owner: root
+        group: bind
+        mode: '0644'
+
+    - name: Copy zone file for reverse lookup
+      copy:
+        src: db.192
+        dest: /etc/bind/db.192
+        owner: root
+        group: bind
+        mode: '0644'
+
+    - name: Ensure BIND9 is started and enabled
+      service:
+        name: bind9
+        state: started
+        enabled: yes

@@ -1,10 +1,17 @@
-- name: Install tools
+---
+- name: Install network tools and renew DHCP
+  hosts: client
   become: yes
-  apt:
-    name:
-      - dnsutils
-      - isc-dhcp-client
-    state: present
 
-- name: Renovate DHCP
-  command: dhclient -r eth1 && dhclient eth1 -v
+  tasks:
+
+    - name: Install network tools
+      apt:
+        name:
+          - dnsutils
+          - isc-dhcp-client
+        state: present
+        update_cache: yes
+
+    - name: Renew DHCP lease on eth1
+      command: dhclient -r eth1 && dhclient eth1 -v
