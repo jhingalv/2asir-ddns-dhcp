@@ -24,6 +24,6 @@ all:
           ansible_host: 127.0.0.1
           ansible_port: 2201
           ansible_user: vagrant
-          ansible_ssh_private_key_file: .vagrant/machines/cliente/virtualbox/private_key
+          ansible_ssh_private_key_file: .vagrant/machines/client/virtualbox/private_key
           ansible_python_interpreter: /usr/bin/python3
           
