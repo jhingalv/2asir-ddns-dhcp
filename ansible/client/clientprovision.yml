@@ -1,0 +1,35 @@
+- name: Install network tools and renew DHCP for 192.168.58.x
+  hosts: client
+  become: yes
+
+  tasks:
+
+    - name: Install network tools
+      apt:
+        name:
+          - dnsutils
+          - isc-dhcp-client
+        state: present
+        update_cache: yes
+
+    - name: Gather network facts
+      ansible.builtin.setup:
+        gather_subset:
+          - network
+
+    - name: Find interface with 192.168.58.x
+      set_fact:
+        dhcp_interface: "{{ item }}"
+      loop: "{{ ansible_facts['interfaces'] }}"
+      when: ansible_facts['ansible_' + item].ipv4 is defined and
+            ansible_facts['ansible_' + item].ipv4.address is search('^192\\.168\\.58\\.')
+      register: iface_search
+
+    - name: Check if interface found
+      debug:
+        msg: "DHCP interface to renew: {{ dhcp_interface }}"
+      when: dhcp_interface is defined
+
+    - name: Renew DHCP lease on target interface
+      command: dhclient -r {{ dhcp_interface }} && dhclient {{ dhcp_interface }} -v
+      when: dhcp_interface is defined

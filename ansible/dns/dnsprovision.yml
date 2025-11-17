@@ -18,13 +18,18 @@
       args:
         creates: "{{ tsig_key_path }}"
 
-    - name: Save TSIG key
+    - name: Save TSIG key to file
       copy:
         content: "{{ tsig_key.stdout }}"
         dest: "{{ tsig_key_path }}"
         owner: root
         group: bind
         mode: '0600'
+      when: tsig_key is changed
+
+    - name: Extract TSIG secret
+      set_fact:
+        tsig_secret: "{{ tsig_key.stdout | regex_search('secret\\s+\"([^\"]+)\"', '\\1', ignorecase=True) }}"
       when: tsig_key is changed
 
     - name: Include TSIG key in named.conf.options
@@ -34,7 +39,7 @@
         block: |
           key "ddns-key" {
             algorithm hmac-sha256;
-            secret "{{ tsig_key.stdout_lines[1].split(' ')[2] | replace(';','') }}";
+            secret "{{ tsig_secret }}";
           };
       when: tsig_key is changed
 

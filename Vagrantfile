@@ -9,7 +9,7 @@ Vagrant.configure("2") do |config|
       ip: "192.168.58.10",
       virtualbox__intnet: "ddns"
     dns.vm.provision "ansible" do |ansible|
-      ansible.playbook = "ansible/roles/dns/main.yml"
+      ansible.playbook = "ansible/dns/dnsprovision.yml"
       ansible.inventory_path = "ansible/inventory"
       ansible.limit = "dns"
     end
@@ -22,7 +22,7 @@ Vagrant.configure("2") do |config|
       ip: "192.168.58.20",
       virtualbox__intnet: "ddns"
     dhcp.vm.provision "ansible" do |ansible|
-      ansible.playbook = "ansible/roles/dhcp/main.yml"
+      ansible.playbook = "ansible/dhcp/dhcpprovision.yml"
       ansible.inventory_path = "ansible/inventory"
       ansible.limit = "dhcp"
     end
@@ -35,7 +35,7 @@ Vagrant.configure("2") do |config|
       type: "dhcp",
       virtualbox__intnet: "ddns"
     client.vm.provision "ansible" do |ansible|
-      ansible.playbook = "ansible/roles/client/main.yml"
+      ansible.playbook = "ansible/client/clientprovision.yml"
       ansible.inventory_path = "ansible/inventory"
       ansible.limit = "client"
     end
